@@ -19,6 +19,6 @@ async Task OnMessage(Message msg, UpdateType type)
 {
     if (msg.Text == "/start")
     {
-        await bot.SendMessage(msg.Chat, "bot");
+        await bot.SendMessage(msg.Chat, "bott");
     }
 }
