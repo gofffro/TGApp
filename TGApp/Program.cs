@@ -1,24 +1,21 @@
-﻿using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
+﻿using TGApp;
 using DotNetEnv;
 
-Env.Load();
-var token = Environment.GetEnvironmentVariable("TELEGRAM_TOKEN");
-using var cts = new CancellationTokenSource();
-var bot = new TelegramBotClient(token);
-var me = await bot.GetMe();
-bot.OnMessage += OnMessage;
-
-Console.WriteLine($"@{me.Username} is running... Press Enter to terminate");
-Console.ReadLine();
-cts.Cancel(); 
-
-// method that handle messages received by the bot:
-async Task OnMessage(Message msg, UpdateType type)
+internal class Program
 {
-    if (msg.Text == "/start")
+    static void Main()
     {
-        await bot.SendMessage(msg.Chat, "bott");
+        Env.Load();
+        var token = Environment.GetEnvironmentVariable("TELEGRAM_TOKEN");
+
+        if (string.IsNullOrEmpty(token))
+        {
+            Console.WriteLine("TELEGRAM_TOKEN is not set in the environment variables.");
+            return;
+        }
+
+        Host bot = new Host(token);
+        bot.Start();
+        Console.ReadLine();
     }
 }
