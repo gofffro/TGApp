@@ -11,6 +11,7 @@ namespace TGApp
 {
     class Host
     {
+        public Action<ITelegramBotClient, Update>? OnMessage;
         private TelegramBotClient _bot;
 
         public Host(string token)
@@ -21,6 +22,7 @@ namespace TGApp
         public void Start()
         {
             _bot.StartReceiving(UpdateHandler, ErrorHandler);
+            Console.WriteLine("Bot started.");
         }
 
         private async Task ErrorHandler(ITelegramBotClient client, Exception exception, HandleErrorSource source, CancellationToken token)
@@ -32,6 +34,7 @@ namespace TGApp
         private async Task UpdateHandler(ITelegramBotClient client, Update update, CancellationToken token)
         {
             Console.WriteLine($"Message received: {update.Message?.Text ?? "No text"}");
+            OnMessage?.Invoke(client, update);
             await Task.CompletedTask;
         }
     }
