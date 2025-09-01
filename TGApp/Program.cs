@@ -2,6 +2,8 @@
 using DotNetEnv;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
 internal class Program
 {
@@ -19,6 +21,7 @@ internal class Program
         Host bot = new Host(token);
         bot.Start();
         bot.OnMessage += OnMessage;
+        
 
         
         Console.ReadLine();
@@ -26,10 +29,20 @@ internal class Program
 
     private static async void OnMessage(ITelegramBotClient client, Update update)
     {
-        if (update.Message?.Text == "/start")
+        if (update.Message?.Text?.ToLower() == "/start")
         {
-            await client.SendMessage(update.Message.Chat.Id, "Выберите категорию товара: ");
+            var inlineKeyboard = new InlineKeyboardMarkup(
+                new List<InlineKeyboardButton[]>()
+                {
+                    new InlineKeyboardButton[]
+                    {
+                        InlineKeyboardButton.WithCallbackData("Шины", "chooseTyres"),
+                        InlineKeyboardButton.WithCallbackData("Диски", "chooseDisks"),
+                        InlineKeyboardButton.WithCallbackData("Колеса", "chooseWheels")
+                    }
+                });
+            await client.SendMessage(update.Message.Chat.Id, "Выберите категорию: ", replyMarkup: inlineKeyboard);
+            return; // Выход из метода
         }
-        await Task.CompletedTask;
     }
 }
