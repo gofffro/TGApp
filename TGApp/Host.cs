@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace TGApp
 {
@@ -34,7 +35,51 @@ namespace TGApp
         private async Task UpdateHandler(ITelegramBotClient client, Update update, CancellationToken token)
         {
             Console.WriteLine($"Message received: {update.Message?.Text ?? "No text"}");
-            OnMessage?.Invoke(client, update);
+            try
+            {
+                switch (update.Type)
+                {
+                    case UpdateType.Message:
+                    {
+                            OnMessage?.Invoke(client, update);
+                            return;
+                    }
+                    case UpdateType.CallbackQuery:
+                    {
+                            var callbackQuery = update.CallbackQuery;
+                            var user = callbackQuery.From;
+                            var chat = callbackQuery.Message.Chat;
+                            Console.WriteLine($"{user.Username} ({user.Id}) clicked on {callbackQuery.Data}");
+                            switch (callbackQuery.Data)
+                            {
+                                case "chooseTyres":
+                                {
+                                        await client.AnswerCallbackQuery(callbackQuery.Id);
+                                        await client.SendMessage(chat.Id, "Вы выбрали шины!");
+                                        return;            
+                                }
+                                case "chooseDisks":
+                                {
+                                        await client.AnswerCallbackQuery(callbackQuery.Id);
+                                        await client.SendMessage(chat.Id, "Вы выбрали диски!");
+                                        return;            
+                                }
+                                case "chooseWheels":
+                                {
+                                        await client.AnswerCallbackQuery(callbackQuery.Id);
+                                        await client.SendMessage(chat.Id, "Вы выбрали колеса!");
+                                        return;            
+                                }
+                            }
+
+                            return;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
             await Task.CompletedTask;
         }
     }
